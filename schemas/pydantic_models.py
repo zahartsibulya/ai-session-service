@@ -4,12 +4,14 @@ from datetime import datetime
 
 class MessageCreate(BaseModel):
     content: str = Field(..., min_length=1, description="Текст повідомлення користувача")   #Field перевіряє, щоб повідомлення не було порожнім
+    model: Optional[str] = None
 
 class MessageResponse(BaseModel):
     id: str
     role: str
     content: str
     tokens_used: int
+    is_archived: bool
     cost: float
     created_at: datetime
 
@@ -24,6 +26,8 @@ class SessionResponse(BaseModel):
     model_name: str
     total_tokens: int
     total_cost: float
+    active_tokens: int
+    active_cost: float
     created_at: datetime
     messages: List[MessageResponse] = []
 
