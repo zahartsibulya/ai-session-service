@@ -16,14 +16,24 @@
 
 ## Приклади API requests (cURL)
 
-**1. Створити нову chat session:**
+**1. Створити нову chat session (із заданням системного промпту):**
+curl -X 'POST' \
+  '[http://127.0.0.1:8000/api/v1/sessions](http://127.0.0.1:8000/api/v1/sessions)' \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{
+  "model_name": "gpt-4o-mini",
+  "system_prompt": "Ти досвідчений AI Engineer. Відповідай коротко."
+}'
+
+**2. Створити нову chat session:**
 curl -X 'POST' \
   '[http://127.0.0.1:8000/api/v1/sessions](http://127.0.0.1:8000/api/v1/sessions)' \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
   -d '{"model_name": "gpt-4o-mini"}'
 
-**2. Надіслати повідомлення у конкретну session:**
+**3. Надіслати повідомлення у конкретну session:**
 (замініть {id} на UUID отриманої сесії)
 curl -X 'POST' \
   '[http://127.0.0.1:8000/api/v1/sessions/](http://127.0.0.1:8000/api/v1/sessions/){id}/messages' \
@@ -31,7 +41,7 @@ curl -X 'POST' \
   -H 'Accept: application/json' \
   -d '{"content": "Привіт! Яка столиця України?"}'
 
-3. Отримати session, повну історію та накопичену вартість:
+**4. Отримати session, повну історію та накопичену вартість:**
 curl -X 'GET' \
   '[http://127.0.0.1:8000/api/v1/sessions/](http://127.0.0.1:8000/api/v1/sessions/){id}' \
   -H 'Accept: application/json'
