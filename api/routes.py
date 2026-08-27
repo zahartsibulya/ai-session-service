@@ -13,7 +13,10 @@ def create_session(session_data: SessionCreate, db: DBSession = Depends(get_db))
     if not is_model_supported(session_data.model_name):
         raise HTTPException(status_code=400, detail=f"Model '{session_data.model_name}' is not supported.")
     
-    db_session = Session(model_name=session_data.model_name)
+    db_session = Session(
+        model_name=session_data.model_name,
+        system_prompt=session_data.system_prompt
+    )
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
@@ -33,6 +36,7 @@ def get_session(session_id: str, db: DBSession = Depends(get_db)):
     return {
         "id": db_session.id,
         "model_name": db_session.model_name,
+        "system_prompt": db_session.system_prompt,
         "total_tokens": db_session.total_tokens,
         "total_cost": db_session.total_cost,
         "active_tokens": db_session.active_tokens,
@@ -71,8 +75,12 @@ def send_message(session_id: str, message_data: MessageCreate, db: DBSession = D
         Message.session_id == session_id, 
         Message.is_archived == False
     ).order_by(Message.created_at).all()
-    
-    openai_messages = [{"role": msg.role, "content": msg.content} for msg in history]
+
+    openai_messages = []
+    if db_session.system_prompt:
+        openai_messages.append({"role": "system", "content": db_session.system_prompt})
+        
+    openai_messages.extend([{"role": msg.role, "content": msg.content} for msg in history])
 
     try:
         ai_content, prompt_tokens, comp_tokens = get_chat_response(used_model, openai_messages)
@@ -93,6 +101,10 @@ def send_message(session_id: str, message_data: MessageCreate, db: DBSession = D
     db_session.active_tokens += total_tokens_used
     db_session.active_cost += interaction_cost
 
+    db.commit()
+    db.refresh(ai_message)
+
+    return ai_message
     db.commit()
     db.refresh(ai_message)
 
