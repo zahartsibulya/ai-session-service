@@ -20,10 +20,12 @@ class MessageResponse(BaseModel):
 
 class SessionCreate(BaseModel):
     model_name: Optional[str] = "gpt-4o-mini"
+    system_prompt: Optional[str] = None
 
 class SessionResponse(BaseModel):
     id: str
     model_name: str
+    system_prompt: Optional[str]
     total_tokens: int
     total_cost: float
     active_tokens: int
