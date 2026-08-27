@@ -9,6 +9,7 @@ class Session(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     model_name = Column(String, default="gpt-4o-mini")
+    system_prompt = Column(String, nullable=True)
 
     total_tokens = Column(Integer, default=0)
     total_cost = Column(Float, default=0.0)
